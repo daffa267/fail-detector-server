@@ -1,12 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import pandas as pd
-import joblib
+from app.api.routes import router as api_router
 
-app = FastAPI(title="Mesin Anomaly API")
+app = FastAPI(title="Sistem Deteksi Anomali IIoT")
 
-# Mengizinkan Frontend (Next.js) berkomunikasi dengan Backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -14,28 +11,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Memuat model AI
-model = joblib.load('model.pkl')
-
-# Menentukan struktur data yang akan diterima dari web
-class SensorData(BaseModel):
-    type: float
-    air_temperature: float
-    process_temperature: float
-    rotational_speed: float
-    torque: float
-    tool_wear: float
-
-@app.post("/predict")
-def predict_anomaly(data: SensorData):
-    # Mengubah data JSON menjadi DataFrame
-    input_df = pd.DataFrame([data.dict()])
-    
-    # Melakukan prediksi
-    prediksi = model.predict(input_df)
-    
-    # Menentukan hasil
-    status = int(prediksi[0]) 
-    pesan = "Anomali Terdeteksi!" if status == 1 else "Mesin Normal"
-    
-    return {"status_kode": status, "pesan": pesan}
+# Menempelkan rute API ke aplikasi utama
+app.include_router(api_router)
