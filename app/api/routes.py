@@ -6,6 +6,6 @@ router = APIRouter()
 
 @router.post("/predict")
 def predict_anomaly(data: SensorData):
-    # Eksekusi fungsi AI dan kembalikan hasilnya
-    hasil = predict_machine_status(data.model_dump()) # Gunakan .model_dump() untuk Pydantic v2
+    hasil = predict_machine_status(data.model_dump())
     return hasil
+    
